@@ -2,6 +2,8 @@
 
 **Find every API key on your machine, see which ones are exposed, and fix them.**
 
+![keyward: finds four exposed keys, checks which still work, rotates one everywhere](docs/launch/keyward-launch.gif)
+
 An API key is a credit card for compute. They leak every day: pushed to git, bundled into a frontend through a `NEXT_PUBLIC_` variable, pasted into an AI chat, left in shell history, or stolen from a host that gets hacked. Usually you find out from the bill.
 
 keyward finds them first, tells you which ones still work, replaces a leaked key everywhere it lives in one step, and can freeze a key whose spend suddenly spikes. It runs on your machine: **it stores nothing, never shows a full key (not even in its own dashboard), and only goes on the network when you ask**, and then only to the key's own provider or your hosting platform. It's open source so you can check that.

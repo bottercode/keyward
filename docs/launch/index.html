@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "SFMono"; src: local("SF Mono"), url("file:///System/Library/Fonts/SFNSMono.ttf"); }
+  html, body { margin: 0; background: #0a0a0a; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0a0a0a;
+           font-family: "SFMono", Menlo, monospace; color: #e5e5e5; }
+  .abs { position: absolute; white-space: pre; }
+  .c { left: 0; width: 1920px; text-align: center; }
+  .row { position: absolute; left: 120px; width: 1680px; height: 92px; display: flex; align-items: center; gap: 34px;
+         font-size: 30px; border-bottom: 2px solid #1f1f1f; white-space: nowrap; }
+  .badge { width: 190px; font-size: 26px; font-weight: 700; letter-spacing: 2px; padding: 8px 0; border-radius: 10px; text-align: center; }
+  .who { width: 175px; font-weight: 700; }
+  .key { width: 345px; color: #a3a3a3; }
+  .why { width: 600px; color: #a3a3a3; font-size: 28px; }
+  .row > span { flex-shrink: 0; }
+  .row .pill { margin-left: auto; }
+  .pill { font-size: 24px; font-weight: 700; letter-spacing: 1.5px; padding: 6px 14px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+// keyward launch loop, 15 s. Every key shown is from scripts/demo.mjs-style fake data.
+const RED = "#ef4444", ORANGE = "#f97316", YELLOW = "#eab308", GREEN = "#22c55e", AMBER = "#f5b83d", TEXT = "#e5e5e5", DIM = "#737373";
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const ease = (v) => 1 - Math.pow(1 - clamp(v), 3);
+const inOut = (v) => { const x = clamp(v); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const mix = (a, b, k) => a + (b - a) * k;
+const band = (t, a, b, f = 0.35) => Math.min(ease((t - a) / f), 1 - ease((t - (b - f)) / f));
+
+const ROWS = [
+  { risk: "CRITICAL", color: RED, solid: true, who: "OpenAI", key: "sk-proj-…f6ut", why: "NEXT_PUBLIC_: shipped to every visitor", live: true },
+  { risk: "HIGH", color: ORANGE, who: "Anthropic", key: "sk-ant-api03-…xjE7", why: "deleted, but still in git history", live: true },
+  { risk: "HIGH", color: ORANGE, who: "Stripe", key: "sk_live_…xlUd", why: "committed and pushed", live: false },
+  { risk: "MEDIUM", color: YELLOW, who: "GitHub", key: "ghp_…sMBW", why: "pasted into a Claude Code chat", live: true },
+];
+const STEPS = [
+  "acme-web/.env.local",
+  "acme-worker/.env",
+  "~/.zshrc",
+  "Vercel · acme-web · OPENAI_API_KEY",
+  "GitHub Actions · acme/web · OPENAI_API_KEY",
+];
+
+function title(t, text, a, b, color = TEXT, top = 90, size = 56) {
+  const o = band(t, a, b);
+  if (o <= 0) return "";
+  return `<div class="abs c" style="top:${top}px;font-size:${size}px;opacity:${o};transform:translateY(${(1 - ease((t - a) / 0.45)) * 18}px);color:${color}">${text}</div>`;
+}
+
+function render(t) {
+  const fadeAll = Math.min(ease(t / 0.25), 1 - ease((t - 14.6) / 0.4));
+  let h = "";
+
+  // 1. The hook, centered, then the question moves up.
+  h += title(t, "An API key is a credit card for compute.", 0.1, 2.3, TEXT, 480, 62);
+  h += title(t, "Where are yours?", 2.2, 6.7, TEXT);
+
+  // 2. The command.
+  const cmd = "npx keyward ~/code --home";
+  const cmdA = band(t, 2.35, 6.7);
+  if (cmdA > 0) {
+    const n = Math.floor(clamp((t - 2.5) / 0.9) * cmd.length);
+    const caret = t < 3.6 && Math.floor(t * 3) % 2 === 0 ? "▍" : "";
+    h += `<div class="abs" style="left:120px;top:220px;font-size:44px;opacity:${cmdA}"><span style="color:${DIM}">$ </span>${cmd.slice(0, n)}${caret}</div>`;
+  }
+
+  // 3. Findings, one by one; then whether each key still works.
+  const rowsOut = 1 - ease((t - 8.5) / 0.4);
+  ROWS.forEach((r, i) => {
+    const a = ease((t - 3.7 - i * 0.45) / 0.4) * rowsOut;
+    if (a <= 0) return;
+    const live = ease((t - 7.0 - i * 0.18) / 0.3);
+    const pill = live > 0
+      ? `<span class="pill" style="opacity:${live};background:${r.live ? "rgba(239,68,68,.16)" : "rgba(34,197,94,.16)"};color:${r.live ? RED : GREEN}">${r.live ? "STILL WORKS" : "REVOKED"}</span>`
+      : "";
+    const badge = r.solid ? `background:${r.color};color:#fff` : `background:${r.color}22;color:${r.color}`;
+    h += `<div class="row" style="top:${330 + i * 112}px;opacity:${a};transform:translateX(${(1 - a) * -30}px)">` +
+      `<span class="badge" style="${badge}">${r.risk}</span><span class="who">${r.who}</span><span class="key">${r.key}</span><span class="why">${r.why}</span>${pill}</div>`;
+  });
+  h += title(t, "Which ones still work?", 6.6, 8.6, TEXT);
+  const note = band(t, 7.1, 8.6);
+  if (note > 0) h += `<div class="abs c" style="top:820px;font-size:30px;color:${DIM};opacity:${note}">each key asked only of its own provider</div>`;
+
+  // 4. Rotate everywhere.
+  h += title(t, "Rotate it everywhere. One paste.", 8.5, 11.5, TEXT);
+  const stepsOut = 1 - ease((t - 11.3) / 0.4);
+  STEPS.forEach((s, i) => {
+    const a = ease((t - 8.9 - i * 0.12) / 0.35) * stepsOut;
+    if (a <= 0) return;
+    const done = ease((t - 9.6 - i * 0.32) / 0.2);
+    const mark = done > 0.5 ? `<span style="color:${GREEN}">✓</span>` : `<span style="color:${DIM}">·</span>`;
+    h += `<div class="abs" style="left:430px;top:${300 + i * 92}px;font-size:40px;opacity:${a}">${mark}  ${s}<span style="color:${DIM}">${done > 0.5 ? "  new key" : ""}</span></div>`;
+  });
+
+  // 5. End card.
+  const end = ease((t - 11.6) / 0.5);
+  if (end > 0) {
+    h += `<div class="abs c" style="top:300px;font-size:120px;font-weight:700;color:${AMBER};opacity:${end};transform:translateY(${(1 - end) * 24}px)">keyward</div>`;
+    h += `<div class="abs c" style="top:480px;font-size:46px;opacity:${ease((t - 11.9) / 0.5)}">find · check · rotate · freeze</div>`;
+    h += `<div class="abs c" style="top:570px;font-size:36px;color:${DIM};opacity:${ease((t - 12.2) / 0.5)}">Runs on your machine. Stores nothing. Open source.</div>`;
+    h += `<div class="abs c" style="top:720px;font-size:50px;opacity:${ease((t - 12.6) / 0.5)}"><span style="color:${DIM}">$ </span>npx keyward</div>`;
+  }
+  document.getElementById("stage").innerHTML = `<div style="opacity:${fadeAll}">${h}</div>`;
+}
+window.render = render;
+render(0);
+</script>
+</body>
+</html>
