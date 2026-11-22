@@ -9,13 +9,13 @@ An API key is a credit card for compute. They leak every day: pushed to git, bun
 keyward finds them first, tells you which ones still work, replaces a leaked key everywhere it lives in one step, and can freeze a key whose spend suddenly spikes. It runs on your machine: **it stores nothing, never shows a full key (not even in its own dashboard), and only goes on the network when you ask**, and then only to the key's own provider or your hosting platform. It's open source so you can check that.
 
 ```bash
-npx keyward                # dashboard for the current folder
-npx keyward ~/code --home  # every project in ~/code, plus your home folder
-npx keyward scan           # the same report in the terminal
-npx keyward hook install   # block commits that contain a key
+npx @keywardhq/cli                 # dashboard for the current folder
+npx @keywardhq/cli ~/code --home   # every project in ~/code, plus your home folder
+npx @keywardhq/cli scan            # the same report in the terminal
+npx @keywardhq/cli hook install    # block commits that contain a key
 ```
 
-> keyward isn't on npm yet. Until it is, run it from a clone: `pnpm install && pnpm build && node dist/cli.js`.
+> Installed globally (`npm i -g @keywardhq/cli`), the command is just `keyward`.
 
 ## What it checks
 
@@ -42,7 +42,9 @@ The same key found in several places is shown once, with every place it lives an
 
 ## The dashboard
 
-`npx keyward` opens a local page at `http://localhost:7711`. It shows a count per risk level, one row per key (worst first), and for each key: why it's exposed, the steps to fix it, every file, commit, chat or history entry that holds it, and four buttons:
+![The keyward dashboard: two keys anyone on the internet can read, each key with a reach meter from "This machine" to "The internet"](docs/dashboard.png)
+
+`npx @keywardhq/cli` opens a local page at `http://localhost:7711`. It opens with one sentence on the worst exposure, then shows each key's **reach**, how far it has travelled: *this machine* (a gitignored env file), *spread around* (chats, shell history, files git could pick up), *your repo* (committed or in history) or *the internet* (in code served to browsers). Keys are listed worst first; open one to see why it's exposed, the steps to fix it, every file, commit, chat or history entry that holds it, and four buttons:
 
 - **Check if it still works**: asks the key's provider, and only that provider, with its cheapest read-only call (list models, who am I). A leaked key that's already revoked is harmless; one that still works is an emergency.
 - **Rotate everywhere**: see below.
@@ -56,8 +58,8 @@ The server listens on 127.0.0.1 only, refuses requests addressed to any other ho
 ## Check whether a key still works
 
 ```bash
-npx keyward scan --verify        # check every medium-or-worse key
-npx keyward verify <id>          # check one (the id is shown next to each key)
+npx @keywardhq/cli scan --verify   # check every medium-or-worse key
+npx @keywardhq/cli verify <id>     # check one (the id is shown next to each key)
 ```
 
 Supported: OpenAI, Anthropic, Google (also tells you whether the Gemini API is enabled for the key), OpenRouter (and how much it has spent), Groq, xAI, Hugging Face, Replicate, Stripe, GitHub, npm, Slack, SendGrid. AWS access keys can't be checked without their secret half.
@@ -67,8 +69,8 @@ Supported: OpenAI, Anthropic, Google (also tells you whether the Gemini API is e
 You create the new key at the provider; keyward never asks a provider for one. Then:
 
 ```bash
-npx keyward rotate <id>            # the plan: every place the key lives and what will happen there
-npx keyward rotate <id> --apply    # asks for the new key (hidden), or reads it from stdin
+npx @keywardhq/cli rotate <id>           # the plan: every place the key lives and what will happen there
+npx @keywardhq/cli rotate <id> --apply   # asks for the new key (hidden), or reads it from stdin
 ```
 
 or click **Rotate everywhere** in the dashboard. keyward:
@@ -87,10 +89,10 @@ or click **Rotate everywhere** in the dashboard. keyward:
 A stolen key shows up as usage you didn't make. With an admin key in the environment, keyward polls each provider's usage per key and flags a key running far above its normal level (by default at least 5× its usual hourly tokens, or its usual daily dollars):
 
 ```bash
-ANTHROPIC_ADMIN_KEY=… npx keyward                 # Spend tab in the dashboard, checked every 5 minutes
-ANTHROPIC_ADMIN_KEY=… npx keyward watch            # the same in a terminal, with a desktop notification
-ANTHROPIC_ADMIN_KEY=… npx keyward watch --freeze   # and freeze a spiking key automatically
-npx keyward freeze anthropic <key id>              # freeze one by hand (--unfreeze to undo)
+ANTHROPIC_ADMIN_KEY=… npx @keywardhq/cli                  # Spend tab in the dashboard, checked every 5 minutes
+ANTHROPIC_ADMIN_KEY=… npx @keywardhq/cli watch            # the same in a terminal, with a desktop notification
+ANTHROPIC_ADMIN_KEY=… npx @keywardhq/cli watch --freeze   # and freeze a spiking key automatically
+npx @keywardhq/cli freeze anthropic <key id>              # freeze one by hand (--unfreeze to undo)
 ```
 
 | Provider | Admin key variable | Watches | Freeze |
@@ -104,8 +106,8 @@ Admin keys are read from the environment when keyward starts and never written a
 ## Block commits that contain a key
 
 ```bash
-npx keyward hook install     # adds a git pre-commit hook (never overwrites someone else's hook)
-npx keyward staged           # what the hook runs: scans only what's staged
+npx @keywardhq/cli hook install   # adds a git pre-commit hook (never overwrites someone else's hook)
+npx @keywardhq/cli staged         # what the hook runs: scans only what's staged
 ```
 
 A blocked commit shows the key (masked), the file and line, and how to proceed. Test-mode keys, temporary credentials and keys in `.keywardignore` don't block. If you use husky or lefthook, add `keyward staged` to your pre-commit step instead.
@@ -117,8 +119,8 @@ A blocked commit shows the key (masked), the file and line, and how to proceed. 
 ## In CI
 
 ```bash
-npx keyward scan --fail-on high   # exit 1 if any key is high or critical
-npx keyward scan --json           # machine-readable
+npx @keywardhq/cli scan --fail-on high   # exit 1 if any key is high or critical
+npx @keywardhq/cli scan --json           # machine-readable
 ```
 
 Options: `--home`, `--no-history` (skip git history; much faster on big repos), `--all` (list low-risk keys too), `--fail-on critical|high|medium|low|none`, `--port`, `--no-open`.

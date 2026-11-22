@@ -1,6 +1,6 @@
 {
-  "name": "keyward",
-  "version": "0.1.0",
+  "name": "@keywardhq/cli",
+  "version": "0.1.1",
   "description": "Find every API key on your machine, see which ones are exposed, and fix them. Open source, local only: keyward stores nothing and sends nothing.",
   "keywords": [
     "api-keys",

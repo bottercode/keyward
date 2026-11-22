@@ -17,7 +17,7 @@ export function hookScript(version: string, node = process.execPath, cli = fileU
 ${MARKER}: blocks commits that contain API keys. Remove with: keyward hook uninstall
 if [ -f ${shellQuote(cli)} ] && [ -x ${shellQuote(node)} ]; then exec ${shellQuote(node)} ${shellQuote(cli)} staged; fi
 if command -v keyward >/dev/null 2>&1; then exec keyward staged; fi
-exec npx --yes keyward@${version} staged
+exec npx --yes @keywardhq/cli@${version} staged
 `;
 }
 

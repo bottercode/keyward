@@ -60,7 +60,7 @@ function render(t) {
   h += title(t, "Where are yours?", 2.2, 6.7, TEXT);
 
   // 2. The command.
-  const cmd = "npx keyward ~/code --home";
+  const cmd = "npx @keywardhq/cli ~/code --home";
   const cmdA = band(t, 2.35, 6.7);
   if (cmdA > 0) {
     const n = Math.floor(clamp((t - 2.5) / 0.9) * cmd.length);
@@ -102,7 +102,7 @@ function render(t) {
     h += `<div class="abs c" style="top:300px;font-size:120px;font-weight:700;color:${AMBER};opacity:${end};transform:translateY(${(1 - end) * 24}px)">keyward</div>`;
     h += `<div class="abs c" style="top:480px;font-size:46px;opacity:${ease((t - 11.9) / 0.5)}">find · check · rotate · freeze</div>`;
     h += `<div class="abs c" style="top:570px;font-size:36px;color:${DIM};opacity:${ease((t - 12.2) / 0.5)}">Runs on your machine. Stores nothing. Open source.</div>`;
-    h += `<div class="abs c" style="top:720px;font-size:50px;opacity:${ease((t - 12.6) / 0.5)}"><span style="color:${DIM}">$ </span>npx keyward</div>`;
+    h += `<div class="abs c" style="top:720px;font-size:50px;opacity:${ease((t - 12.6) / 0.5)}"><span style="color:${DIM}">$ </span>npx @keywardhq/cli</div>`;
   }
   document.getElementById("stage").innerHTML = `<div style="opacity:${fadeAll}">${h}</div>`;
 }
