@@ -1,0 +1,56 @@
+{
+  "name": "keyward",
+  "version": "0.1.0",
+  "description": "Find every API key on your machine, see which ones are exposed, and fix them. Open source, local only: keyward stores nothing and sends nothing.",
+  "keywords": [
+    "api-keys",
+    "secrets",
+    "secret-scanning",
+    "leak",
+    "openai",
+    "anthropic",
+    "security",
+    "env"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bottercode/keyward.git"
+  },
+  "homepage": "https://github.com/bottercode/keyward#readme",
+  "bugs": "https://github.com/bottercode/keyward/issues",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "keyward": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "ui",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "keyward": "node dist/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

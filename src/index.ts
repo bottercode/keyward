@@ -1,0 +1,13 @@
+export { scan, homeSources, kindOf, type ScanOptions } from "./scan.js";
+export { startServer, type Server, type ServerOptions, type State } from "./server.js";
+export { formatReport, formatFinding, formatSummary } from "./report.js";
+export { DETECTORS, findKeys, findEnvSecret, parseEnvLine, looksFake, type Detector, type Match } from "./detectors.js";
+export { assess, reasonFor, isPublicEnvName, PUBLIC_ENV_PREFIXES } from "./risk.js";
+export { recover, recoverFrom } from "./recover.js";
+export { verifyKey, canVerify, type VerifyResult, type KeyStatus } from "./verify.js";
+export { addIgnore, loadIgnores, parseIgnore, IGNORE_FILE } from "./ignore.js";
+export { scanStaged, formatStaged, type StagedResult } from "./staged.js";
+export { installHook, uninstallHook, hookScript } from "./hook.js";
+export { planRotation, applyRotation, checkNewKey, type RotatePlan, type RotateStep, type Runner } from "./rotate.js";
+export { snapshot, setFrozen, adminKeys, hintMatches, formatAmount, type SpendSnapshot, type WatchedKey, type WatchProvider } from "./watch.js";
+export * from "./model.js";
